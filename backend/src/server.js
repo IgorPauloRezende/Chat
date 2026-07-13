@@ -9,7 +9,12 @@ wss.on("connection", (ws) => {
     ws.on("error", console.error)
 
     ws.on("message", (data) => {
-        wss.clients.forEach((client) => client.send(data.toString()))
+        // não ecoar para o próprio remetente (evita duplicidade no front)
+        wss.clients.forEach((client) => {
+            if (client !== ws && client.readyState === client.OPEN) {
+                client.send(data.toString())
+            }
+        })
     })
 
     console.log("client connected")
